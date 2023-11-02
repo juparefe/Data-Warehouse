@@ -1,0 +1,473 @@
+<!-- Alerta con el rol -->
+<div class="alert alert-primary m-1 min-width-250">
+  Recuerda que has ingresado con el usuario: <strong>{{user.userName | titlecase}}</strong> y el rol de: <strong>{{user.role}}</strong>
+</div>
+<h2 class="p-3">Contactos</h2>
+<!-- Div filtrar, importar, exportar y agregar datos -->
+<div class="d-flex flex-wrap mx-3 container-buttons">
+  <!-- Dropdown del filtro PrimeNg Dialog-->
+  <div class="d-flex">
+    <button type="button" class="btn btn-outline-primary dropdown-toggle min-width-button" (click)="showDialog = !showDialog">
+      Filtrar
+    </button>
+    <p-dialog header="Filtrar contactos" [(visible)]="showDialog" [style]="{width: '90vw'}" [maximizable]="true">
+      <form class="px-4 pt-3" [formGroup]="filters">
+        <div class="mb-3">
+          <label for="dropdownFormContact" class="form-label">Nombre del contacto</label>
+          <input type="text" class="form-control" id="dropdownFormContact" placeholder="Juan" (change)="checkFilters($event)" formControlName="name" name="name">
+        </div>
+        <div class="mb-3">
+          <label for="dropdownFormPosition" class="form-label">Cargo actual</label>
+          <input type="text" class="form-control" id="dropdownFormPosition" placeholder="Developer" (change)="checkFilters($event)" formControlName="position" name="position">
+        </div>
+        <div class="mb-3">
+          <div class="form-floating">
+            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="updateCountryOptions($event, 'filter'); checkFilters($event)" formControlName="region" name="region">
+              <option value="all" selected>Todos</option>
+              <option *ngFor="let region of regions" [value]="region">{{region}}</option>
+            </select>
+            <label for="floatingSelect">Region</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-floating">
+            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="checkFilters($event)" formControlName="country" name="country">
+              <option value="all" selected>Todos</option>
+              <option *ngFor="let country of countriesByRegion" [value]="country">{{country}}</option>
+            </select>
+            <label for="floatingSelect">Pais</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-floating">
+            <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="checkFilters($event)" formControlName="company" name="company">
+              <option value="all" selected>Todos</option>
+              <option *ngFor="let company of companies" [value]="company.name">{{company.name}}</option>
+            </select>
+            <label for="floatingSelect">Compañia</label>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-floating">
+            <p-multiSelect
+              #multiSelectFilter
+              autoWidth="false"
+              defaultLabel="Medios de comunicacion favoritos"
+              display="chip"
+              formArrayName="channels"
+              (onChange)="checkFilters($event, 'channels')"
+              [options]="channelOptions"
+              name="channels"
+              [style]="{'width':'100%'}"
+            ></p-multiSelect>
+          </div>
+        </div>            
+      </form>
+    <ng-template pTemplate="footer">
+      <p-button icon="pi pi-check" (click)="applyFilters()" label="Aplicar filtros seleccionados" styleClass="p-button-text">
+        <i class="bi-search icon_color"></i>
+      </p-button>
+    </ng-template>
+  </p-dialog>
+  </div>
+  <!-- Boton importar datos -->
+  <button class="btn btn-outline-primary min-width-button" data-bs-toggle="modal" data-bs-target="#modalImport" *ngIf="user.role === 'Administrador'">
+      Importar
+      <i class="bi bi-file-arrow-up icon_color"></i>
+  </button>
+  <!-- Modal importar datos -->
+  <div class="modal fade" id="modalImport" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Importar contactos</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Selecciona el archivo de tu ordenador para importar los contactos
+            <i class="bi bi-cloud-plus-fill"></i>
+            <input type="file" class="form-control mt-2" id="csv-file" (change)="loadCSVFile($event)">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="addContacts()">Importar</button>
+          </div>
+        </div>
+      </div>
+  </div>
+  <!-- Boton exportar datos -->
+  <button class="btn btn-outline-primary dropdown-toggle min-width-button" data-bs-toggle="dropdown" aria-expanded="false">
+      Exportar
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" (click)="exportSelectedToExcel()">Exportar seleccionados</a></li>
+        <li><a class="dropdown-item" (click)="exportToExcel(contacts)">Todos los filtrados</a></li>
+      </ul>
+  </button>
+  <!-- Boton añadir datos -->
+  <button class="btn btn-primary min-width-button" data-bs-toggle="modal" data-bs-target="#modalAdd" *ngIf="user.role === 'Administrador'">
+      Agregar
+  </button>
+  <!-- Modal añadir datos-->
+  <div class="modal fade" id="modalAdd" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Nuevo contacto</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form form autocomplete="off" [formGroup]="newContact" (ngSubmit)="addContact()">
+                  <div class="form-group mb-1">
+                    <div class="d-flex justify-content-center">
+                      <img style="max-width: 25%" [src]="imageSrc" alt="Imagen" id="imagenPrevisualizar" class="mb-3">
+                    </div>
+                    <label class="form-control btn btn-primary">
+                      <input class="form-control btn btn-file" name="fileAdd" type="file" (change)="onFileImageChange($event, 'save')">
+                      <input type="hidden" name="fileHidden" formControlName="img"/>
+                    </label>
+                    <p *ngIf="fileAdd" class="pl-4 align-middle mb-0">{{fileAdd.name}}</p>
+                    <span class="form-text text-danger" *ngIf="invalidImageType">
+                      <br>Solo se aceptan imagenes en formato jpg, jpeg o png
+                    </span>
+                    <span class="form-text text-danger" *ngIf="fileTooLarge">
+                      <br>La imagen seleccionada pesa mas de 1 Mb
+                    </span>
+                  </div> 
+                  <div class="form-group mt-1">
+                      <label for="name" class="form-label">Nombre del contacto:</label>
+                      <input type="text" class="form-control" id="name" placeholder="Juan" formControlName="name">
+                      <span class="form-text text-danger" *ngIf="validateField('name', 'save')">
+                        Debe de ser de 3 letras minimo
+                      </span>
+                  </div>
+                  <div class="form-group">
+                      <label for="position">Cargo actual:</label>
+                      <input type="text" class="form-control" id="position" placeholder="Developer" formControlName="position">
+                      <span class="form-text text-danger" *ngIf="validateField('position', 'save')">
+                        Debe de ser de 2 letras minimo
+                      </span>
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Correo electronico:</label>
+                    <input type="email" class="form-control" id="email" placeholder="prueba@gmail.com" formControlName="email">
+                    <span class="form-text text-danger" *ngIf="validateField('email', 'save')">
+                     El correo electronico ingresado no es valido
+                    </span>
+                  </div>
+                  <div class="dropdown">
+                    <label for="region">Region:</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="updateCountryOptions($event, 'save')" formControlName="region">
+                      <option value="all" selected>Selecciona una region</option>
+                      <option *ngFor="let region of regions" [value]="region">{{region}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('region', 'save')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                  </div>
+                  <div class="dropdown">
+                    <label for="floatingSelect">Pais:</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="country">
+                      <option value="all" selected>Selecciona un pais</option>
+                      <option *ngFor="let country of countriesByRegion" [value]="country">{{country}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('country', 'save')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                  </div>
+                  <div class="dropdown">
+                    <label for="floatingSelect">Compañia:</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="company">
+                      <option value="all" selected>Selecciona una compañia</option>
+                      <option *ngFor="let company of companies" [value]="company.name">{{company.name}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('company', 'save')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                  </div>
+                  <div class="my-3">
+                    <div class="form-floating">
+                      <p-multiSelect
+                        #multiSelectAdd
+                        autoWidth="false"
+                        defaultLabel="Medios de comunicacion favoritos"
+                        display="chip"
+                        formArrayName="channels"
+                        (onChange)="setChannels($event)"
+                        [options]="channelOptions"
+                        name="channels"
+                        [style]="{'width':'100%'}"
+                      ></p-multiSelect>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-group">
+                      <label for="customRange" class="form-label">Nivel de interes: </label>
+                      <p-rating formControlName="interestRate" name="interestRate" (onRate)="updateRangeValue($event)"></p-rating>
+                    </div> 
+                  </div> 
+                  <!-- <div class="form-group">
+                    <label for="customRange" class="form-label">Nivel de interes: <strong id="rangeValueSave">50%</strong></label>
+                    <div class="range">
+                      <input type="range" class="form-range" min="0" max="100" step="25.0" id="customRange" (input)="updateRangeValue($event, 'rangeValueSave')" list="mydata"/>
+                    </div>
+                  </div>  -->
+                  <div class="form-group modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="newContact.invalid || invalidImageType || fileTooLarge">Guardar contacto</button>
+                  </div> 
+              </form>
+          </div>
+        </div>
+      </div>
+  </div>    
+</div>
+<!-- Div Filtros seleccionados y eliminar datos -->
+<div class="d-flex flex-wrap mx-3 container-buttons">
+  <!-- Filtros seleccionados -->
+  <div class="d-flex flex-wrap align-items-center m-1">
+    <button type="button" class="mx-1 custom-filter"
+      *ngFor="let filter of selectedFilters; let i = index">
+      <small class="text-ellipsis">
+        <span *ngIf="isFilterArray(filter.filter)">{{ filter.filter.join(', ') }}</span>
+        <span *ngIf="!isFilterArray(filter.filter)">{{ filter.filter }}</span>
+      </small>
+      <div>
+        <i class="bi bi-x icon_color mx-1" (click)="removeFilter(i)"></i>
+      </div>
+    </button>
+  </div>
+  <!-- Boton eliminar datos -->
+  <div class="mx-3 mb-1" *ngIf="numberOfRowSelected > 0">
+    <small>{{numberOfRowSelected | i18nPlural:rowsMapping}} </small>
+    <button type="button" class="btn btn-secondary mx-2"
+      data-bs-toggle="modal" data-bs-target="#modalDelete">
+      <i class="bi bi-trash mx-2"></i>
+      <small>Borrar contactos</small>
+    </button>
+    <!-- Modal eliminar datos -->
+    <div class="modal fade" id="modalDelete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Eliminar contactos</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            ¿Seguro que deseas eliminar los contactos seleccionados?
+            <i class="bi bi-person-rolodex"></i>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="deleteContacts()">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Alerta con la respuesta -->
+<div *ngIf="responseMessage" class="alert {{ responseMessage.includes('correctamente') ? 'alert-success' : 'alert-danger' }}">
+  {{ responseMessage }}
+</div>
+<!-- Tabla visualizar datos -->
+<div class="table-responsive mx-2">
+  <table class="table text-center">
+      <caption>Numero total de registros: {{contacts.length}}</caption>
+      <thead>
+        <tr>
+          <th scope="col">
+              <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" [(ngModel)]="selectedRows" (change)="selectAllRows()">
+          </th>
+          <th scope="col">
+            <div class="d-flex column-header">
+              Contacto
+              <i class="bi bi-arrow-down-up mx-2" (click)="sortData('name')"></i>
+            </div>
+          </th>
+          <th scope="col">
+            <div class="d-flex column-header">
+                Pais/Region
+                <i class="bi bi-arrow-down-up mx-2" (click)="sortData('region')"></i>
+            </div>
+          </th>
+          <th scope="col">
+            <div class="d-flex column-header">
+              Compañia
+              <i class="bi bi-arrow-down-up mx-2" (click)="sortData('company')"></i>
+            </div>
+          </th>
+          <th scope="col">
+              <div class="d-flex column-header">
+                  Cargo
+                  <i class="bi bi-arrow-down-up mx-2" (click)="sortData('position')"></i>
+              </div>
+          </th>
+          <th scope="col">
+              <div class="d-flex column-header">
+                  Canales de comunicacion
+              </div>
+          </th>
+          <th scope="col">
+              <div class="d-flex column-header">
+                  Interes
+              </div>
+          </th>
+          <th scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of contacts; let i=index" class="align-items-center" [ngClass]="{'selected-row': item.selected}">
+          <td>
+            <div class="d-flex align-items-center">
+              <input class="form-check-input" type="checkbox" id="checkbox-{{i}}" [(ngModel)]="item.selected" (change)="selectSomeRows()">
+            </div>
+          </td>
+          <td class="long-text-cell">
+              <div class="d-flex align-items-center">
+                  <img src="{{item.img}}" alt="ejemplo" class="contact-image">
+                  <div class="m-1">{{item.name}}</div>
+              </div>
+          </td>
+          <td class="long-text-cell">
+              <div class="d-flex flex-column">
+                  <div>{{item.region}}</div>
+                  <div>{{item.country}}</div>
+              </div>
+          </td>
+          <td class="long-text-cell">
+              <div>{{item.company}}</div>
+          </td>
+          <td class="long-text-cell">
+              <div>{{item.position}}</div>
+          </td>
+          <td>
+            <button type="button" class="btn btn-sm btn-ligth border-primary m-1"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip" 
+              *ngFor="let channel of item.channels">
+                <small>{{channel}}</small>
+            </button>
+          </td>
+          <td class="long-text-cell">
+            {{item.interestRate * 20}}%
+            <div class="progress" role="progressbar"  aria-label="Example with label" aria-valuenow="item.interestRate" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar" [style.width.%]="item.interestRate * 20"></div>
+            </div>
+          </td>
+          <td>
+            <div class="d-flex">
+              <button type="button" class="btn btn-outline-primary m-1" (click)="deleteContact(i, item.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+              <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal" data-bs-target="#modalUpdate" (click)="fillForm(item)">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+  </table>
+  <!-- Modal actualizar datos-->
+  <div class="modal fade" id="modalUpdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Actualizar contacto</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form form autocomplete="off" [formGroup]="updateContactInfo" (ngSubmit)="updateContact()">
+                <div class="form-group mb-1">
+                  <div class="d-flex justify-content-center">
+                    <img style="max-width: 25%" [src]="imageSrcUpdate" alt="Imagen2" id="imagenPrevisualizar2" class="mb-3">
+                  </div>
+                  <label class="form-control btn btn-primary">
+                  <input class="form-control btn btn-file" name="fileUpdate" type="file" (change)="onFileImageChange($event, 'update')">
+                  <input type="hidden" name="fileHidden2" formControlName="img"/>
+                  </label>
+                  <p *ngIf="fileAdd" class="pl-4 align-middle mb-0">{{fileAdd.name}}</p>
+                  <span class="form-text text-danger" *ngIf="invalidImageType">
+                    <br>Solo se aceptan imagenes en formato jpg, jpeg o png
+                  </span>
+                  <span class="form-text text-danger" *ngIf="fileTooLarge">
+                    <br>La imagen seleccionada pesa mas de 1 Mb
+                  </span>
+                </div> 
+                <div class="form-group mt-1">
+                  <label for="name" class="form-label">Nombre del contacto:</label>
+                  <input type="text" class="form-control" id="name" placeholder="Juan" formControlName="name">
+                  <span class="form-text text-danger" *ngIf="validateField('name', 'update')">
+                    Debe de ser de 3 letras minimo
+                  </span>
+                </div>
+                <div class="form-group">
+                    <label for="acronym">Cargo actual:</label>
+                    <input type="text" class="form-control" id="position" placeholder="FB" formControlName="position">
+                    <span class="form-text text-danger" *ngIf="validateField('position', 'update')">
+                      Debe de ser de 2 letras minimo
+                    </span>
+                </div>
+                <div class="form-group">
+                  <label for="email">Correo electronico:</label>
+                  <input type="email" class="form-control" id="email" placeholder="prueba@gmail.com" formControlName="email">
+                  <span class="form-text text-danger" *ngIf="validateField('email', 'update')">
+                   El correo electronico ingresado no es valido
+                  </span>
+                </div>
+                <div class="dropdown">
+                  <label for="region">Region:</label>
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="updateCountryOptions($event, 'update')" formControlName="region">
+                    <option value="all" selected>Selecciona una region</option>
+                    <option *ngFor="let region of regions" [value]="region">{{region}}</option>
+                  </select>
+                  <span class="form-text text-danger" *ngIf="validateField('region', 'update')">
+                    Debe seleccionar alguna opcion
+                  </span>
+                </div>
+                <div class="dropdown">
+                  <label for="floatingSelect">Pais</label>
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="country">
+                    <option value="all" selected>Selecciona un pais</option>
+                    <option *ngFor="let country of countriesByRegion" [value]="country">{{country}}</option>
+                  </select>
+                  <span class="form-text text-danger" *ngIf="validateField('country', 'update')">
+                    Debe seleccionar alguna opcion
+                  </span>
+                </div>
+                <div class="my-3">
+                  <div class="form-floating">
+                    <p-multiSelect
+                      #multiSelectUpdate
+                      autoWidth="false"
+                      defaultLabel="Medios de comunicacion favoritos"
+                      display="chip"
+                      formArrayName="channels"
+                      (onChange)="setChannels($event)"
+                      [options]="channelOptions"
+                      name="channels"
+                      [style]="{'width':'100%'}"
+                    ></p-multiSelect>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="form-group">
+                    <label for="customRange" class="form-label me-3">Nivel de interes: </label>
+                    <p-rating formControlName="interestRate" name="interestRate" (onRate)="updateRangeValue($event)"></p-rating>
+                  </div> 
+                </div> 
+                <!-- <div class="form-group">
+                  <label for="customRange" class="form-label">Nivel de interes:<strong id="rangeValueUpdate" formControlName="interestRate">50%</strong></label>
+                  <div class="range">
+                    <input type="range" class="form-range" min="0" max="100" step="25.0" id="customRange" (input)="updateRangeValue($event)" list="mydata"/>
+                  </div>
+                </div> -->
+                <div class="form-group modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="updateContactInfo.invalid || invalidImageType || fileTooLarge">Actualizar contacto</button>
+                </div> 
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

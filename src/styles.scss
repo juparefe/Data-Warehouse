@@ -1,1 +1,76 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'node_modules/bootstrap/scss/bootstrap';
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #3578B5;
+  border-radius: 4px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-track {
+  background-color: #FFF;
+}
+
+.container-buttons {
+  justify-content: space-around;
+}
+
+.custom-width-form {
+  width: 80vw;
+}
+
+.custom-width-modal {
+  width: 80vw;
+}
+
+h2 {
+  margin-bottom: 0;
+}
+
+.min-width-button {
+  min-width: 40vw;
+  margin-left: 0;
+  margin-bottom: 10px;
+}
+
+.min-width-100 {
+  min-width: 100px;
+}
+
+.min-width-250 {
+  min-width: 250px;
+}
+
+@media (min-width: 480px) {
+
+  .min-width-button {
+    min-width: 45vw !important;
+  }
+}
+
+@media (min-width: 700px) {
+  .container-buttons {
+    justify-content: start !important;
+  }
+
+  .custom-width-modal {
+    width: 150px;
+  }
+
+  .min-width-button {
+    min-width: 20vw !important;
+    margin-left: 16px !important;     
+  }
+}
+
+@media (min-width: 900px) {
+
+  .min-width-button {
+    min-width: 180px !important;
+    margin-left: 16px !important;  
+  }
+}

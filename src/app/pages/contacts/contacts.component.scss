@@ -1,0 +1,62 @@
+  .column-header {
+    white-space: nowrap; /* Evita el salto de línea */
+    overflow: hidden; /* Oculta el texto que no cabe */
+    text-overflow: ellipsis; /* Muestra puntos suspensivos si el texto es demasiado largo */
+    justify-content: center;
+  }
+  
+  .contact-image {
+      max-width: 40%; /* Ajusta este valor según tus necesidades */
+      height: auto;   /* Esto asegura que la imagen mantenga su relación de aspecto */
+  }
+  
+  .custom-filter {
+    padding: 0.2rem;
+    margin: 0.1rem 0;
+    display: inline-flex;
+    border: var(--bs-primary-bg-subtle) solid 1px;
+    border-radius: 10px;
+    background-color: var(--bs-primary-bg-subtle);
+    max-width: 40vw; /* Establece un ancho máximo de 40vw */
+    white-space: nowrap; /* Evita el salto de línea del texto */
+    i {
+      font-weight: bolder;
+    }
+    .text-ellipsis {
+      overflow: hidden; /* Oculta cualquier contenido que se desborde */
+      text-overflow: ellipsis; /* Muestra tres puntos suspensivos (...) cuando el texto se desborde */
+    }
+  }
+
+  ::ng-deep .p-multiselect-token {
+    /* Estilos para los chips */
+    margin: 0 0.5vw; /* Ejemplo de margen de 50px */
+    /* Otros estilos para los chips */
+  }
+
+  //.p-multiselect.p-multiselect-chip .p-multiselect-token {
+  .p-multiselect-chip,.p-multiselect-chip {
+    margin: 50px; 
+  }
+  
+  .long-text-cell {
+      max-width: 200px; /* Ajusta este valor según tus necesidades */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+  }
+    
+  .long-text-cell div {
+      white-space: normal;
+      word-wrap: break-word;
+  }
+
+  .selected-row, .dropdown-toggle.btn-outline-primary:active, .dropdown-toggle.btn-outline-primary:focus {
+      background-color: var(--bs-primary-bg-subtle);
+      color: #000;
+  }
+  
+  .table thead tr {
+      border-top: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+  }

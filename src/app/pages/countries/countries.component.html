@@ -1,0 +1,125 @@
+<!-- Alerta con el rol -->
+<div class="alert alert-primary m-1">
+    Recuerda que has ingresado con el usuario: <strong>{{user.userName | titlecase}}</strong> y el rol de: <strong>{{user.role}}</strong>
+</div>
+<h2 class="p-3">Informes por region / pais</h2>
+<div *ngIf="user.role === 'Administrador'">
+    <!-- Grafica Usuarios por continente-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartUsersRegion (change)="toggleChart(chartUsersRegion.checked, 'UsersRegion')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Usuarios por continente
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showUsersRegion" (click)="downloadChart('chartUsersRegion')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col"  *ngIf="showUsersRegion">
+            <app-bar-chart [barChartData]="dataUsersRegion" [chartId]="'chartUsersRegion'"></app-bar-chart>
+        </div>
+    </div>
+    <!-- Grafica Usuarios por pais-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartUsersCountry (change)="toggleChart(chartUsersCountry.checked, 'UsersCountry')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Usuarios por pais
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showUsersCountry" (click)="downloadChart('chartUsersCountry')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col"  *ngIf="showUsersCountry">
+            <app-bar-chart [barChartData]="dataUsersCountry" [chartId]="'chartUsersCountry'"></app-bar-chart>
+        </div>
+    </div>
+    <!-- Grafica Compañias por continente-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartCompaniesRegion (change)="toggleChart(chartCompaniesRegion.checked, 'CompaniesRegion')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Compañias por continente
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showCompaniesRegion" (click)="downloadChart('chartCompaniesRegion')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col"  *ngIf="showCompaniesRegion">
+            <app-bar-chart [barChartData]="dataCompaniesRegion" [chartId]="'chartCompaniesRegion'"></app-bar-chart>
+        </div>
+    </div>
+    <!-- Grafica Compañias por pais-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartCompaniesCountry (change)="toggleChart(chartCompaniesCountry.checked, 'CompaniesCountry')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Compañias por pais
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showCompaniesCountry" (click)="downloadChart('chartCompaniesCountry')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col"  *ngIf="showCompaniesCountry">
+            <app-bar-chart [barChartData]="dataCompaniesCountry" [chartId]="'chartCompaniesCountry'"></app-bar-chart>
+        </div>
+    </div>
+    <!-- Grafica Compañias por sector-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartCompaniesSector (change)="toggleChart(chartCompaniesSector.checked, 'CompaniesSector')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Compañias por sector
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showCompaniesSector" (click)="downloadChart('chartCompaniesSector')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col" *ngIf="showCompaniesSector">
+            <app-bar-chart [barChartData]="dataCompaniesSector" [chartId]="'chartCompaniesSector'"></app-bar-chart>
+        </div>
+    </div>
+    <!-- Grafica Contactos por compañia-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartContactsCompany (change)="toggleChart(chartContactsCompany.checked, 'ContactsCompany')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Contactos por compañia
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showContactsCompany" (click)="downloadChart('chartContactsCompany')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col" *ngIf="showContactsCompany">
+            <app-bar-chart [barChartData]="dataContactsCompany" [chartId]="'chartContactsCompany'"></app-bar-chart>
+        </div>
+    </div>
+    <!-- Grafica Usuarios subscritos al boletin-->
+    <div class="row m-3 p-1">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" #chartUsersSubscribed (change)="toggleChart(chartUsersSubscribed.checked, 'UsersSubscribed')" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">
+                Usuarios subscritos al boletin
+                <button class="btn btn-floating btn-primary btn-sm mx-1" *ngIf="showUsersSubscribed" (click)="downloadChart('chartUsersSubscribed')">
+                    <i class="bi bi-download"></i>
+                </button>
+            </label>
+        </div>
+        <div class="col" *ngIf="showUsersSubscribed">
+            <app-pie-chart [pieChartData]="dataUsersSubscribed" [chartId]="'chartUsersSubscribed'"></app-pie-chart>
+        </div>
+    </div>    
+</div>
+
+<!-- Alerta con la respuesta -->
+<div *ngIf="responseMessage" class="alert {{ responseMessage.includes('correctamente') ? 'alert-success' : 'alert-danger' }}">
+    {{ responseMessage }}
+</div>
+<div *ngIf="user.role === 'Cliente'" class="d-flex m-5">
+    <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Restringido</h5>
+          <p class="card-text">No tienes permisos de administrador para ver este contenido.</p>
+        </div>
+    </div>
+</div>

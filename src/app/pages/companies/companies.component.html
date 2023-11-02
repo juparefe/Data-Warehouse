@@ -1,0 +1,506 @@
+<h2 class="p-3">Compañias</h2>
+<!-- Div filtrar, importar, exportar y agregar datos -->
+<div class="d-flex flex-wrap mx-3 container-buttons">
+  <!-- Dropdown del filtro-->
+  <div class="d-flex mb-2">
+    <div class="btn-group">
+      <button type="button" class="btn btn-outline-primary dropdown-toggle flex custom-width-modal" data-bs-toggle="dropdown" data-bs-target="#modalFilter" aria-expanded="false">
+        Filtrar
+      </button>
+      <div class="dropdown-menu" id="modalFilter">
+          <form class="px-4 py-3 custom-width-form" [formGroup]="filters">
+            <div class="mb-3">
+              <label for="exampleDropdownFormCompany1" class="form-label">Nombre de la compañia</label>
+              <input type="text" class="form-control" id="exampleDropdownFormCompany1" placeholder="Facebook" (change)="checkFilters($event)" formControlName="name" name="name">
+            </div>
+            <div class="mb-3">
+              <label for="exampleDropdownFormAcronym1" class="form-label">Siglas de la compañia</label>
+              <input type="text" class="form-control" id="exampleDropdownFormAcronym1" placeholder="FB" (change)="checkFilters($event)" formControlName="acronym" name="acronym">
+            </div>
+            <div class="mb-3">
+              <label for="exampleDropdownFormAcronym1" class="form-label">Numero de identificacion de la compañia</label>
+              <input type="text" class="form-control" id="exampleDropdownFormAcronym1" placeholder="612345" (change)="checkFilters($event)" formControlName="idNumber" name="idNumber">
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="checkFilters($event)" formControlName="size" name="size">
+                    <option value="all" selected>Todos</option>
+                    <option *ngFor="let size of sizes" [value]="size">{{size}}</option>
+                  </select>
+                  <label for="floatingSelect">Numero de empleados de la compañia</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="checkFilters($event)" formControlName="sector" name="sector">
+                    <option value="all" selected>Todos</option>
+                    <option *ngFor="let sector of sectors" [value]="sector">{{sector}}</option>
+                  </select>
+                  <label for="floatingSelect">Sector economico de la compañia</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="updateCountryOptions($event); checkFilters($event)" formControlName="region" name="region">
+                  <option value="all" selected>Todos</option>
+                  <option *ngFor="let region of regions" [value]="region">{{region}}</option>
+                </select>
+                <label for="floatingSelect">Region</label>
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="form-floating">
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="checkFilters($event)" formControlName="country" name="country">
+                    <option value="all" selected>Todos</option>
+                    <option *ngFor="let country of countriesByRegion" [value]="country">{{country}}</option>
+                  </select>
+                  <label for="floatingSelect">Pais</label>
+              </div>
+            </div>
+          </form>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary m-2" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary m-2" (click)="applyFilters()">Aplicar Filtros</button>
+          </div>
+      </div>
+    </div>
+    <button class="btn btn-outline-primary ms-1" (click)="applyFilters()">
+      <i class="bi-search icon_color"></i>
+    </button>
+  </div>
+  <!-- Boton importar datos -->
+  <button class="btn btn-outline-primary min-width-button" data-bs-toggle="modal" data-bs-target="#modalImport">
+    Importar
+    <i class="bi bi-file-arrow-up icon_color"></i>
+  </button>
+  <!-- Modal importar datos -->
+  <div class="modal fade " id="modalImport" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Importar compañias</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Selecciona el archivo de tu ordenador para importar las compañias
+          <i class="bi bi-cloud-plus-fill"></i>
+          <input type="file" class="form-control mt-2" id="csv-file" (change)="loadCSVFile($event)">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" (click)="addCompanies()">Importar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Boton exportar datos -->
+  <div class="dropdown">
+    <button class="btn btn-outline-primary dropdown-toggle min-width-button" role="button" data-bs-toggle="dropdown" aria-expanded="false">Exportar</button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" (click)="exportSelectedToExcel()">Exportar seleccionados</a></li>
+      <li><a class="dropdown-item" (click)="exportToExcel(companies)">Todos los filtrados</a></li>
+    </ul>
+  </div>
+   <!-- Boton añadir datos -->
+   <button class="btn btn-primary min-width-button" data-bs-toggle="modal" data-bs-target="#modalAdd">
+    Agregar
+  </button>
+  <!-- Modal añadir datos-->
+  <div class="modal fade" id="modalAdd" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Nueva compañia</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form form autocomplete="off" [formGroup]="newCompany" (ngSubmit)="addCompany()">
+                <div class="form-group">
+                  <div class="d-flex justify-content-center">
+                    <img style="max-width: 25%" [src]="imageSrc" alt="Imagen" id="imagenPrevisualizar" class="mb-3">
+                  </div>
+                  <label class="form-control btn btn-primary">
+                    <input class="form-control btn btn-file" name="fileAdd" type="file" (change)="onFileImageChange($event, 'save')">
+                    <input type="hidden" name="fileHidden" formControlName="img"/>
+                  </label>
+                  <p *ngIf="fileAdd" class="pl-4 align-middle mb-0">{{fileAdd.name}}</p>
+                  <span class="form-text text-danger" *ngIf="invalidImageType">
+                    <br>Solo se aceptan imagenes en formato jpg, jpeg o png
+                  </span>
+                  <span class="form-text text-danger" *ngIf="fileTooLarge">
+                    <br>La imagen seleccionada pesa mas de 1 Mb
+                  </span>
+                </div> 
+                <div class="form-group mt-1">
+                    <label for="name" class="form-label">Nombre de la compañia:</label>
+                    <input type="text" class="form-control" id="name" placeholder="Facebook" formControlName="name">
+                    <span class="form-text text-danger" *ngIf="validateField('name', 'save')">
+                      Debe de ser de 3 letras minimo
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label for="acronym">Siglas de la compañia:</label>
+                    <input type="text" class="form-control" id="acronym" placeholder="FB" formControlName="acronym">
+                    <span class="form-text text-danger" *ngIf="validateField('acronym', 'save')">
+                      Debe de ser de 2 letras minimo
+                    </span>
+                </div>
+                <div class="form-group">
+                    <label for="idNumber">Numero de identificacion de la compañia:</label>
+                    <input type="text" class="form-control" id="idNumber" placeholder="612345" formControlName="idNumber">
+                    <span class="form-text text-danger" *ngIf="validateField('idNumber', 'save')">
+                      Debe contener 5 letras minimo y solo se aceptan numeros
+                    </span>
+                </div>
+                <div class="dropdown">
+                    <label for="floatingSelect">Numero de empleados de la compañia:</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="size">
+                      <option value="all" selected>Selecciona un numero</option>
+                      <option *ngFor="let size of sizes" [value]="size">{{size}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('size', 'save')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                </div>
+                <div class="dropdown">
+                  <label for="region">Region:</label>
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="updateCountryOptions($event)" formControlName="region">
+                    <option value="all" selected>Selecciona una region</option>
+                    <option *ngFor="let region of regions" [value]="region">{{region}}</option>
+                  </select>
+                  <span class="form-text text-danger" *ngIf="validateField('region', 'save')">
+                    Debe seleccionar alguna opcion
+                  </span>
+                </div>
+                <div class="dropdown">
+                  <label for="floatingSelect">Pais</label>
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="country">
+                    <option value="all" selected>Selecciona un pais</option>
+                    <option *ngFor="let country of countriesByRegion" [value]="country">{{country}}</option>
+                  </select>
+                  <span class="form-text text-danger" *ngIf="validateField('country', 'save')">
+                    Debe seleccionar alguna opcion
+                  </span>
+                </div>
+                <div class="form-group">
+                  <label for="address">Direccion:</label>
+                  <input type="text" class="form-control" id="address" placeholder="Carrera 1 # 2 - 3" formControlName="address">
+                  <span class="form-text text-danger" *ngIf="validateField('address', 'save')">
+                    La direccion ingresada no es valida
+                  </span>
+                </div>
+                <div class="form-group">
+                  <label for="phone">Telefono de contacto:</label>
+                  <input type="text" class="form-control" id="phone" placeholder="321123457" formControlName="phone">
+                  <span class="form-text text-danger" *ngIf="validateField('phone', 'save')">
+                    Debe contener 5 letras minimo y solo se aceptan numeros
+                  </span>
+                </div>
+                <div class="form-group">
+                  <label for="site">Sitio web:</label>
+                  <input type="text" class="form-control" id="site" placeholder="www.ejemplo.com" formControlName="site">
+                  <span class="form-text text-danger" *ngIf="validateField('site', 'save')">
+                    El sitio web ingresado no es valido
+                  </span>
+                </div> 
+                <div class="dropdown mb-3">
+                  <label for="sector">Sector economico:</label>
+                  <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="sector">
+                    <option value="all" selected>Selecciona un sector</option>
+                    <option *ngFor="let sector of sectors" [value]="sector">{{sector}}</option>
+                  </select>
+                  <span class="form-text text-danger" *ngIf="validateField('sector', 'save')">
+                    Debe seleccionar alguna opcion
+                  </span>
+                </div>
+                <div class="form-group modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="newCompany.invalid || invalidImageType || fileTooLarge">Guardar compañia</button>
+                </div> 
+            </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Div Filtros seleccionados y eliminar datos -->
+<div class="d-flex flex-wrap container-buttons">
+  <!-- Filtros seleccionados -->
+  <div class="d-flex align-items-center m-1">
+    <button type="button" class="mx-1 custom-filter"
+      *ngFor="let filter of selectedFilters; let i = index">
+      <small>{{filter.filter}}</small>
+      <div>
+        <i class="bi bi-x icon_color mx-1" (click)="removeFilter(i)"></i>
+      </div>
+    </button>
+  </div>
+  <!-- Boton eliminar datos -->
+  <div class="mx-3 mb-1" *ngIf="numberOfRowSelected > 0">
+    <small>{{numberOfRowSelected | i18nPlural:rowsMapping}} </small>
+    <button type="button" class="btn btn-secondary mx-2"
+      data-bs-toggle="modal" data-bs-target="#modalDelete">
+      <i class="bi bi-trash mx-2"></i>
+      Borrar compañias
+    </button>
+    <!-- Modal eliminar datos -->
+    <div class="modal fade" id="modalDelete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Eliminar compañias</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            ¿Seguro que deseas eliminar las compañias seleccionadas?
+            <i class="bi bi-person-rolodex"></i>
+            <br>
+            Por favor ten en cuenta que tambien se eliminaran todos los contactos relacionados con estas compañias.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="deleteCompanies()">Eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Alerta con la respuesta -->
+<div *ngIf="responseMessage" class="alert {{ responseMessage.includes('correctamente') ? 'alert-success' : 'alert-danger' }}">
+  {{ responseMessage }}
+</div>
+<!-- Tabla visualizar datos -->
+<div class="table-responsive mx-2">
+    <table class="table text-center">
+        <caption>Numero total de registros: {{companies.length}}</caption>
+        <thead>
+          <tr>
+            <th scope="col">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" [(ngModel)]="selectedRows" (change)="selectAllRows()">
+            </th>
+            <th scope="col">
+                Compañia
+                <i class="bi bi-arrow-down-up mx-2" (click)="sortData('name')"></i>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Pais/Region
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('region')"></i>
+                </div>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Siglas
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('acronym')"></i>
+                </div>
+            </th>
+            <th scope="col">
+                <div class="inline_text">
+                     Identificacion
+                </div>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Empleados
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('size')"></i>
+                </div>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Direccion
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('address')"></i>
+                </div>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Telefono
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('phone')"></i>
+                </div>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Sitio web
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('site')"></i>
+                </div>
+            </th>
+            <th scope="col">
+                <div class="d-flex column-header">
+                    Sector economico
+                    <i class="bi bi-arrow-down-up mx-2" (click)="sortData('sector')"></i>
+                </div>
+            </th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of companies; let i=index" class="align-items-center" [ngClass]="{'selected-row': item.selected}">
+            <td>
+              <div class="d-flex align-items-center">
+                <input class="form-check-input" type="checkbox" id="checkbox-{{i}}" [(ngModel)]="item.selected" (change)="selectSomeRows()">
+              </div>
+            </td>
+            <td class="long-text-cell">
+                <div class="d-flex align-items-center">
+                    <img src="{{item.img}}" alt="ejemplo" class="company-image">
+                    <div class="m-1">{{item.name}}</div>
+                </div>
+            </td>
+            <td class="long-text-cell">
+                <div class="d-flex flex-column">
+                    <div>{{item.region}}</div>
+                    <div>{{item.country}}</div>
+                </div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.acronym}}</div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.idNumber}}</div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.size}}</div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.address}}</div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.phone}}</div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.site}}</div>
+            </td>
+            <td class="long-text-cell">
+                <div>{{item.sector}}</div>
+            </td>
+            <td>
+              <div class="d-flex">
+                <button type="button" class="btn btn-outline-primary m-1" (click)="deleteCompany(i, item.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+                <button type="button" class="btn btn-outline-primary m-1" data-bs-toggle="modal" data-bs-target="#modalUpdate" (click)="fillForm(item)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Modal actualizar datos-->
+    <div class="modal fade" id="modalUpdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Actualizar compañia</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form form autocomplete="off" [formGroup]="updateCompanyInfo" (ngSubmit)="updateCompany()">
+                  <div class="form-group">
+                    <div class="d-flex justify-content-center">
+                      <img style="max-width: 25%" [src]="imageSrcUpdate" alt="Imagen2" id="imagenPrevisualizar2" class="mb-3">
+                    </div>
+                    <label class="btn btn-secondary btn-file">Browse
+                      <input name="fileUpdate" type="file" (change)="onFileImageChange($event, 'update')">
+                      <input type="hidden" name="fileHidden2" formControlName="img"/>
+                    </label>
+                    <p *ngIf="fileUpdate" class="pl-4 align-middle mb-0">{{fileUpdate.name}}</p>
+                    <span class="form-text text-danger" *ngIf="invalidImageType">
+                      <br>Solo se aceptan imagenes en formato jpg, jpeg o png
+                    </span>
+                    <span class="form-text text-danger" *ngIf="fileTooLarge">
+                      <br>La imagen seleccionada pesa mas de 1 Mb
+                    </span>
+                  </div> 
+                  <div class="form-group mt-1">
+                      <label for="name" class="form-label">Nombre de la compañia:</label>
+                      <input type="text" class="form-control" id="name" placeholder="Facebook" formControlName="name">
+                      <span class="form-text text-danger" *ngIf="validateField('name', 'update')">
+                        Debe de ser de 3 letras minimo
+                      </span>
+                  </div>
+                  <div class="form-group">
+                      <label for="acronym">Siglas de la compañia:</label>
+                      <input type="text" class="form-control" id="acronym" placeholder="FB" formControlName="acronym">
+                      <span class="form-text text-danger" *ngIf="validateField('acronym', 'update')">
+                        Debe de ser de 2 letras minimo
+                      </span>
+                  </div>
+                  <div class="form-group">
+                      <label for="idNumber">Numero de identificacion de la compañia:</label>
+                      <input type="text" class="form-control" id="idNumber" placeholder="612345" formControlName="idNumber">
+                      <span class="form-text text-danger" *ngIf="validateField('idNumber', 'update')">
+                        Debe contener 5 letras minimo y solo se aceptan numeros
+                      </span>
+                  </div>
+                  <div class="dropdown">
+                      <label for="floatingSelect">Numero de empleados de la compañia:</label>
+                      <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="size">
+                        <option value="all" selected>Selecciona un numero</option>
+                        <option *ngFor="let size of sizes" [value]="size">{{size}}</option>
+                      </select>
+                      <span class="form-text text-danger" *ngIf="validateField('size', 'update')">
+                        Debe seleccionar alguna opcion
+                      </span>
+                  </div>
+                  <div class="dropdown">
+                    <label for="region">Region:</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" (change)="updateCountryOptions($event)" formControlName="region">
+                      <option value="all" selected>Selecciona una region</option>
+                      <option *ngFor="let region of regions" [value]="region">{{region}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('region', 'update')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                  </div>
+                  <div class="dropdown">
+                    <label for="floatingSelect">Pais</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="country">
+                      <option value="all" selected>Selecciona un pais</option>
+                      <option *ngFor="let country of countriesByRegion" [value]="country">{{country}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('country', 'update')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                  </div>
+                  <div class="form-group">
+                    <label for="address">Direccion:</label>
+                    <input type="text" class="form-control" id="address" placeholder="Carrera 1 # 2 - 3" formControlName="address">
+                    <span class="form-text text-danger" *ngIf="validateField('address', 'update')">
+                      La direccion ingresada no es valida
+                    </span>
+                  </div>
+                  <div class="form-group">
+                    <label for="phone">Telefono de contacto:</label>
+                    <input type="text" class="form-control" id="phone" placeholder="321123457" formControlName="phone">
+                    <span class="form-text text-danger" *ngIf="validateField('phone', 'update')">
+                      Debe contener 5 letras minimo y solo se aceptan numeros
+                    </span>
+                  </div>
+                  <div class="form-group">
+                    <label for="site">Sitio web:</label>
+                    <input type="text" class="form-control" id="site" placeholder="www.ejemplo.com" formControlName="site">
+                    <span class="form-text text-danger" *ngIf="validateField('site', 'update')">
+                      El sitio web ingresado no es valido
+                    </span>
+                  </div> 
+                  <div class="dropdown mb-3">
+                    <label for="sector">Sector economico:</label>
+                    <select class="form-select" id="floatingSelect" aria-label="Floating label select example" formControlName="sector">
+                      <option value="all" selected>Selecciona un sector</option>
+                      <option *ngFor="let sector of sectors" [value]="sector">{{sector}}</option>
+                    </select>
+                    <span class="form-text text-danger" *ngIf="validateField('sector', 'update')">
+                      Debe seleccionar alguna opcion
+                    </span>
+                  </div>
+                  <div class="form-group modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" [disabled]="updateCompanyInfo.touched && updateCompanyInfo.invalid">Actualizar compañia</button>
+                  </div> 
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>

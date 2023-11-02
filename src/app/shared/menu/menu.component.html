@@ -1,0 +1,15 @@
+<nav class="navbar navbar-expand-sm navbar-dark {{menuColor}} navbar-collapse-md-collapsed min-width-250">
+    <div class="container-fluid">
+        <a class="navbar-brand flex-grow-1" href="#">
+            <img src="../../../assets/DataWarehouse.png" alt="Logo" width="150px" height="35px">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto" style="cursor: pointer;">
+            <li class="nav-item text-white p-2" *ngFor="let item of menuOptions; let i=index"  [routerLink]="[item.route]" routerLinkActive="active" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">{{item.name}}</li>
+        </ul>
+      </div>
+    </div>
+</nav>

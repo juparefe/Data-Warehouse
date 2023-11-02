@@ -1,0 +1,33 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": "plugin:@angular-eslint/recommended",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "rules": {
+        "@typescript-eslint/explicit-function-return-type": "off", // Excluir la regla
+        "arrow-spacing": ["error", { "before": true, "after": true }], // Requerir espacios antes y después de las flechas en las funciones flecha
+        "camelcase": "error", // Variables usando camelCase
+        "eol-last": ["error", "always"], // Cada archivo termina con una linea en blanco
+        "indent": ["error", 2], // Identacion de dos espacios
+        "max-len": ["error", { "code": 120 }], // Máxima longitud de línea
+        "no-console": ["warn", { "allow": ["error"] }], // Generar advertencias por el uso de console.log y permitir el console.error
+        "no-multiple-empty-lines": ["error", { "max": 1 }], // Prohibe multiples lineas en blanco
+        "no-trailing-spaces": "error", // No permitir espacion en blanco al final de cada linea
+        "no-unused-vars": ["error", { "vars": "all", "args": "none", "ignoreRestSiblings": false }], // Elimina variables no utilizadas
+        "object-curly-spacing": ["error", "always"], // Los objetos deben tener espacios o no alrededor de las llaves
+        "quotes": ["error", "single", { "allowTemplateLiterals": true }], // Comillas simples 
+        "semi": ["error", "always"], // Requerir puntos y comas al final de las declaraciones
+        "sort-imports": "error", // Ordenar imports alfabeticamente
+        "sort-vars": "error", // Ordenar variables alfabeticamente
+        "spaced-comment": ["warn", "always", { "markers": ["/"] }] //  Requiera un espacio después de // en los comentarios
+    },
+    "ignorePatterns": [
+        "src/app/utilities/constants.ts",
+        "src/test.ts"
+    ]
+}
