@@ -1,31 +1,44 @@
-<<<<<<< HEAD
-# DataWarehouse
-
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.1.3.
-
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
-=======
 # Data-Warehouse
->>>>>>> 4a5dc515430442263c67c0c40479456277ccb96a
+
+Este es el repositorio frontend del Data Warehouse, proporciona una interfaz de usuario para interactuar con el backend del sistema. Aplicando diferentes conceptos como:
+* Exportar informacion en formato .xlsx
+* Gráficas dinamicas basadas en peticiones HTTP
+* Importar informacion en formato .csv
+* Manejo de roles (Administrador y Cliente) en la aplicacion
+* Session storage
+* Tokens de sesion
+* Visualizacion de datos
+
+## Requisitos Previos
+
+Asegúrate de tener instalado lo siguiente:
+
+- Node.js: [Descargar Node.js](https://nodejs.org/)
+- npm (administrador de paquetes de Node.js): Viene incluido con Node.js
+- Angular CLI: Instálalo globalmente con `npm install -g @angular/cli`
+
+**Lenguajes utilizados:** TypeScript  
+**Frameworks, herramientas o librerias utilizados:** Angular, Bootstrap, Chart.js, html2canvas, ng2-charts, PrimeNG, xlsx
+
+## Scripts Disponibles
+* Instalar Dependencias: `npm install`
+* Construir la Aplicación: `npm run build`
+* Linteo del Código: `npm run lint`
+* Iniciar la Aplicación: `npm start`
+
+## Paso a paso para ejecutar el repositorio
+Para poder utilizar este repositorio debes seguir estas instrucciones y luego dirigirte al [Repositorio Backend Data Warehouse](https://github.com/juparefe/Data-Warehouse-Server) y seguir las instrucciones para levantar el complemento de la aplicacion
+* Clonar el repositorio en el entorno local utilizando el comando 
+```
+git clone https://github.com/juparefe/Data-Warehouse.git
+```
+* Abrir la carpeta clonada utilizando algun editor de codigo
+* Instala las dependencias:
+```
+npm install
+```
+* Ejecuta el siguiente comando para iniciar el servidor:
+```
+npm start
+```
+Por defecto la aplicacion se levanta en el puerto [4200](http://localhost:4200/)
